@@ -2,19 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 
 
-def check_password():
-    password = password_var.get()
-
-    if not password:
-        result_label.config(
-            text="Please enter a password",
-            foreground="#d9534f"
-        )
-        strength_var.set("Strength: —")
-        progress_var.set(0)
-        feedback_label.config(text="")
-        return
-
+def evaluate_password(password):
+    """Evaluate the password and return its score and improvement feedback."""
     score = 0
     feedback = []
 
@@ -43,6 +32,22 @@ def check_password():
     else:
         feedback.append("Add special characters")
 
+    return score, feedback
+
+
+def update_password_strength(*args):
+    """Update the password strength automatically while typing."""
+    password = password_var.get()
+
+    if not password:
+        result_label.config(text="")
+        strength_var.set("Strength: —")
+        progress_var.set(0)
+        feedback_label.config(text="")
+        return
+
+    score, feedback = evaluate_password(password)
+
     if score <= 2:
         strength = "Weak"
         colour = "#d9534f"
@@ -64,10 +69,30 @@ def check_password():
     if feedback:
         feedback_label.config(text=" • ".join(feedback))
     else:
-        feedback_label.config(text="Excellent! Your password meets all checks.")
+        feedback_label.config(
+            text="Excellent! Your password meets all security checks."
+        )
+
+
+def check_password():
+    """Keep the button functionality for manually checking the password."""
+    password = password_var.get()
+
+    if not password:
+        result_label.config(
+            text="Please enter a password",
+            foreground="#d9534f"
+        )
+        strength_var.set("Strength: —")
+        progress_var.set(0)
+        feedback_label.config(text="")
+        return
+
+    update_password_strength()
 
 
 def toggle_password():
+    """Show or hide the password text."""
     if password_entry.cget("show") == "":
         password_entry.config(show="*")
         toggle_button.config(text="Show")
@@ -77,11 +102,9 @@ def toggle_password():
 
 
 def clear_password():
+    """Clear the password and reset all results."""
     password_var.set("")
-    result_label.config(text="")
-    strength_var.set("Strength: —")
-    progress_var.set(0)
-    feedback_label.config(text="")
+    password_entry.focus()
 
 
 root = tk.Tk()
@@ -181,6 +204,9 @@ feedback_label = ttk.Label(
     justify="center"
 )
 feedback_label.pack(pady=(5, 0))
+
+# Automatically update password strength whenever the user types.
+password_var.trace_add("write", update_password_strength)
 
 password_entry.focus()
 
