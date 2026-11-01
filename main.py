@@ -22,17 +22,38 @@ def evaluate_password(password):
     return score, requirement_status
 
 
+def get_security_tip(strength):
+    """Return a helpful security tip based on password strength."""
+    tips = {
+        "Weak": (
+            "Security tip: Avoid common words and add more character variety."
+        ),
+        "Medium": (
+            "Security tip: Add more unique characters to make your password stronger."
+        ),
+        "Strong": (
+            "Security tip: Great password! Use a unique password for every account."
+        ),
+    }
+
+    return tips[strength]
+
+
 def update_password_strength(*args):
-    """Update password strength and checklist automatically while typing."""
+    """Update password strength, checklist, and security tip while typing."""
     password = password_var.get()
 
     if not password:
         result_label.config(text="")
         strength_var.set("Strength: —")
         progress_var.set(0)
+        security_tip_label.config(text="")
 
         for label in requirement_labels:
-            label.config(text=f"○ {label.requirement_text}")
+            label.config(
+                text=f"○ {label.requirement_text}",
+                foreground=""
+            )
 
         return
 
@@ -55,6 +76,7 @@ def update_password_strength(*args):
 
     strength_var.set(f"Strength: {strength}")
     progress_var.set(score * 20)
+    security_tip_label.config(text=get_security_tip(strength))
 
     for label, (description, passed) in zip(
         requirement_labels, requirement_status
@@ -101,7 +123,7 @@ def clear_password():
 
 root = tk.Tk()
 root.title("Password Strength Checker")
-root.geometry("520x540")
+root.geometry("520x600")
 root.resizable(False, False)
 
 password_var = tk.StringVar()
@@ -206,6 +228,15 @@ for description, _ in REQUIREMENTS:
     requirement_label.requirement_text = description
     requirement_label.pack(anchor="w", pady=2)
     requirement_labels.append(requirement_label)
+
+security_tip_label = ttk.Label(
+    main_frame,
+    text="",
+    font=("Segoe UI", 10),
+    wraplength=450,
+    justify="left"
+)
+security_tip_label.pack(anchor="w", pady=(20, 0))
 
 # Update password strength and requirements while typing.
 password_var.trace_add("write", update_password_strength)
