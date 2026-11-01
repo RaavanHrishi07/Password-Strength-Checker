@@ -25,17 +25,10 @@ def evaluate_password(password):
 def get_security_tip(strength):
     """Return a helpful security tip based on password strength."""
     tips = {
-        "Weak": (
-            "Security tip: Avoid common words and add more character variety."
-        ),
-        "Medium": (
-            "Security tip: Add more unique characters to make your password stronger."
-        ),
-        "Strong": (
-            "Security tip: Great password! Use a unique password for every account."
-        ),
+        "Weak": "Security tip: Avoid common words and add more character variety.",
+        "Medium": "Security tip: Add more unique characters to make your password stronger.",
+        "Strong": "Security tip: Great password! Use a unique password for every account.",
     }
-
     return tips[strength]
 
 
@@ -52,9 +45,8 @@ def update_password_strength(*args):
         for label in requirement_labels:
             label.config(
                 text=f"○ {label.requirement_text}",
-                foreground=""
+                foreground=current_text_colour
             )
-
         return
 
     score, requirement_status = evaluate_password(password)
@@ -121,31 +113,98 @@ def clear_password():
     password_entry.focus()
 
 
+def toggle_theme():
+    """Switch between light and dark themes."""
+    global dark_mode
+
+    dark_mode = not dark_mode
+
+    if dark_mode:
+        apply_theme(
+            background="#1f1f1f",
+            foreground="#f5f5f5",
+            entry_background="#2b2b2b",
+            button_text="☀ Light Mode"
+        )
+    else:
+        apply_theme(
+            background="#f5f5f5",
+            foreground="#202020",
+            entry_background="#ffffff",
+            button_text="🌙 Dark Mode"
+        )
+
+
+def apply_theme(background, foreground, entry_background, button_text):
+    """Apply colours to the application theme."""
+    global current_text_colour
+
+    current_text_colour = foreground
+
+    root.configure(bg=background)
+    main_frame.configure(style="Main.TFrame")
+
+    style.configure("Main.TFrame", background=background)
+    style.configure(
+        "TLabel",
+        background=background,
+        foreground=foreground
+    )
+    style.configure(
+        "TButton",
+        padding=6
+    )
+    style.configure(
+        "TEntry",
+        fieldbackground=entry_background,
+        foreground=foreground
+    )
+
+    theme_button.config(text=button_text)
+
+    update_password_strength()
+
+
 root = tk.Tk()
 root.title("Password Strength Checker")
 root.geometry("520x600")
 root.resizable(False, False)
 
+style = ttk.Style(root)
+
+dark_mode = False
+current_text_colour = "#202020"
+
 password_var = tk.StringVar()
 strength_var = tk.StringVar(value="Strength: —")
 progress_var = tk.IntVar(value=0)
 
-main_frame = ttk.Frame(root, padding=30)
+main_frame = ttk.Frame(root, padding=30, style="Main.TFrame")
 main_frame.pack(fill="both", expand=True)
 
+top_frame = ttk.Frame(main_frame, style="Main.TFrame")
+top_frame.pack(fill="x")
+
 title_label = ttk.Label(
-    main_frame,
+    top_frame,
     text="Password Strength Checker",
     font=("Segoe UI", 20, "bold")
 )
-title_label.pack(pady=(0, 8))
+title_label.pack(side="left")
+
+theme_button = ttk.Button(
+    top_frame,
+    text="🌙 Dark Mode",
+    command=toggle_theme
+)
+theme_button.pack(side="right")
 
 subtitle_label = ttk.Label(
     main_frame,
     text="Check how strong and secure your password is.",
     font=("Segoe UI", 10)
 )
-subtitle_label.pack(pady=(0, 20))
+subtitle_label.pack(anchor="w", pady=(8, 20))
 
 password_label = ttk.Label(
     main_frame,
@@ -154,7 +213,7 @@ password_label = ttk.Label(
 )
 password_label.pack(anchor="w")
 
-password_frame = ttk.Frame(main_frame)
+password_frame = ttk.Frame(main_frame, style="Main.TFrame")
 password_frame.pack(fill="x", pady=(6, 15))
 
 password_entry = ttk.Entry(
@@ -172,7 +231,7 @@ toggle_button = ttk.Button(
 )
 toggle_button.pack(side="left", padx=(8, 0))
 
-button_frame = ttk.Frame(main_frame)
+button_frame = ttk.Frame(main_frame, style="Main.TFrame")
 button_frame.pack(fill="x")
 
 check_button = ttk.Button(
@@ -238,8 +297,14 @@ security_tip_label = ttk.Label(
 )
 security_tip_label.pack(anchor="w", pady=(20, 0))
 
-# Update password strength and requirements while typing.
 password_var.trace_add("write", update_password_strength)
+
+apply_theme(
+    background="#f5f5f5",
+    foreground="#202020",
+    entry_background="#ffffff",
+    button_text="🌙 Dark Mode"
+)
 
 password_entry.focus()
 
