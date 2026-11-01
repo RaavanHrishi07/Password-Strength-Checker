@@ -1,22 +1,24 @@
 # Password Strength Checker 🔐
 
-A simple and user-friendly desktop application built with Python and Tkinter to help users check the strength of their passwords.
+A clean and user-friendly desktop application built with Python and Tkinter that helps users evaluate the strength of their passwords in real time.
 
-The application analyses a password based on common security criteria and provides clear feedback to help users create a stronger password.
+The application checks common password security requirements, provides a visual strength indicator, displays a live requirements checklist, and offers helpful security tips for creating stronger passwords.
 
 ## ✨ Features
 
-- Checks password strength as **Weak**, **Medium**, or **Strong**
-- Validates password length
-- Checks for lowercase letters
-- Checks for uppercase letters
-- Checks for numbers
-- Checks for special characters
-- Displays a visual password strength progress bar
-- Provides helpful feedback for improving weak passwords
-- Includes a **Show/Hide Password** option
-- Includes a **Clear** button to reset the checker
-- Clean and simple Tkinter GUI
+- ⚡ Real-time password strength checking while typing
+- 🔴🟡🟢 Classifies passwords as Weak, Medium, or Strong
+- 📊 Visual password strength progress bar
+- ✅ Live password requirements checklist
+- 🔤 Checks for lowercase and uppercase letters
+- 🔢 Checks for numbers
+- ✨ Checks for special characters
+- 📏 Validates minimum password length
+- 💡 Dynamic security tips based on password strength
+- 👁️ Show and hide password functionality
+- 🧹 Clear button to reset the checker
+- 🌙 Light and Dark mode toggle
+- 🖥️ Clean and simple Tkinter GUI
 
 ## 🛠️ Technologies Used
 
@@ -48,15 +50,25 @@ Run the following command from the project directory:
 
 ## 🔍 How It Works
 
-The application evaluates a password using five common security criteria:
+The application evaluates each password against five common security requirements:
 
 1. At least 8 characters long
-2. Contains lowercase letters
-3. Contains uppercase letters
-4. Contains numbers
-5. Contains special characters
+2. Contains a lowercase letter
+3. Contains an uppercase letter
+4. Contains a number
+5. Contains a special character
 
-Each satisfied criterion contributes to the overall password score. Based on the final score, the application classifies the password as **Weak**, **Medium**, or **Strong** and displays suggestions for improving it.
+As you type, the application automatically updates the password strength, progress bar, requirements checklist, and security tip.
+
+Passwords are classified as:
+
+- **Weak** — Meets only a few security requirements
+- **Medium** — Meets most security requirements but can be improved
+- **Strong** — Meets all password security requirements
+
+## 🌙 Theme Support
+
+The application includes a built-in Light and Dark mode toggle, allowing users to switch the appearance of the interface.
 
 ## 📁 Project Structure
 
@@ -64,6 +76,8 @@ Each satisfied criterion contributes to the overall password score. Based on the
     │
     ├── main.py
     ├── README.md
+    ├── requirements.txt
+    ├── LICENSE
     └── .gitignore
 
 ## 👤 Author
@@ -74,4 +88,4 @@ GitHub: [@RaavanHrishi07](https://github.com/RaavanHrishi07)
 
 ## 📄 License
 
-This project is currently intended for learning and portfolio purposes.
+This project is licensed under the [MIT License](LICENSE).
