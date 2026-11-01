@@ -2,51 +2,41 @@ import tkinter as tk
 from tkinter import ttk
 
 
+REQUIREMENTS = [
+    ("At least 8 characters", lambda password: len(password) >= 8),
+    ("Contains a lowercase letter", lambda password: any(char.islower() for char in password)),
+    ("Contains an uppercase letter", lambda password: any(char.isupper() for char in password)),
+    ("Contains a number", lambda password: any(char.isdigit() for char in password)),
+    ("Contains a special character", lambda password: any(not char.isalnum() for char in password)),
+]
+
+
 def evaluate_password(password):
-    """Evaluate the password and return its score and improvement feedback."""
-    score = 0
-    feedback = []
+    """Evaluate the password and return its score and requirement status."""
+    requirement_status = [
+        (description, check(password))
+        for description, check in REQUIREMENTS
+    ]
 
-    if len(password) >= 8:
-        score += 1
-    else:
-        feedback.append("Use at least 8 characters")
-
-    if any(char.islower() for char in password):
-        score += 1
-    else:
-        feedback.append("Add lowercase letters")
-
-    if any(char.isupper() for char in password):
-        score += 1
-    else:
-        feedback.append("Add uppercase letters")
-
-    if any(char.isdigit() for char in password):
-        score += 1
-    else:
-        feedback.append("Add numbers")
-
-    if any(not char.isalnum() for char in password):
-        score += 1
-    else:
-        feedback.append("Add special characters")
-
-    return score, feedback
+    score = sum(status for _, status in requirement_status)
+    return score, requirement_status
 
 
 def update_password_strength(*args):
-    """Update the password strength automatically while typing."""
+    """Update password strength and checklist automatically while typing."""
     password = password_var.get()
 
     if not password:
         result_label.config(text="")
         strength_var.set("Strength: —")
         progress_var.set(0)
-        feedback_label.config(text="")
+
+        for label in requirement_labels:
+            label.config(text=f"○ {label.requirement_text}")
+
         return
 
-    score, feedback = evaluate_password(password)
+    score, requirement_status = evaluate_password(password)
 
     if score <= 2:
         strength = "Weak"
@@ -66,26 +56,28 @@ def update_password_strength(*args):
     strength_var.set(f"Strength: {strength}")
     progress_var.set(score * 20)
 
-    if feedback:
-        feedback_label.config(text=" • ".join(feedback))
-    else:
-        feedback_label.config(
-            text="Excellent! Your password meets all security checks."
-        )
+    for label, (description, passed) in zip(
+        requirement_labels, requirement_status
+    ):
+        if passed:
+            label.config(
+                text=f"✓ {description}",
+                foreground="#2e8b57"
+            )
+        else:
+            label.config(
+                text=f"✗ {description}",
+                foreground="#c0392b"
+            )
 
 
 def check_password():
-    """Keep the button functionality for manually checking the password."""
-    password = password_var.get()
-
-    if not password:
+    """Display a message when the password field is empty."""
+    if not password_var.get():
         result_label.config(
             text="Please enter a password",
             foreground="#d9534f"
         )
-        strength_var.set("Strength: —")
-        progress_var.set(0)
-        feedback_label.config(text="")
         return
 
     update_password_strength()
@@ -102,14 +94,14 @@ def toggle_password():
 
 
 def clear_password():
-    """Clear the password and reset all results."""
+    """Clear the password and reset the checker."""
     password_var.set("")
     password_entry.focus()
 
 
 root = tk.Tk()
 root.title("Password Strength Checker")
-root.geometry("520x420")
+root.geometry("520x540")
 root.resizable(False, False)
 
 password_var = tk.StringVar()
@@ -131,7 +123,7 @@ subtitle_label = ttk.Label(
     text="Check how strong and secure your password is.",
     font=("Segoe UI", 10)
 )
-subtitle_label.pack(pady=(0, 25))
+subtitle_label.pack(pady=(0, 20))
 
 password_label = ttk.Label(
     main_frame,
@@ -180,7 +172,7 @@ result_label = ttk.Label(
     text="",
     font=("Segoe UI", 14, "bold")
 )
-result_label.pack(pady=(25, 8))
+result_label.pack(pady=(20, 8))
 
 strength_label = ttk.Label(
     main_frame,
@@ -196,16 +188,26 @@ progress_bar = ttk.Progressbar(
 )
 progress_bar.pack(fill="x", pady=(8, 15))
 
-feedback_label = ttk.Label(
+requirements_title = ttk.Label(
     main_frame,
-    text="",
-    font=("Segoe UI", 10),
-    wraplength=450,
-    justify="center"
+    text="Password Requirements",
+    font=("Segoe UI", 11, "bold")
 )
-feedback_label.pack(pady=(5, 0))
+requirements_title.pack(anchor="w", pady=(5, 8))
 
-# Automatically update password strength whenever the user types.
+requirement_labels = []
+
+for description, _ in REQUIREMENTS:
+    requirement_label = ttk.Label(
+        main_frame,
+        text=f"○ {description}",
+        font=("Segoe UI", 10)
+    )
+    requirement_label.requirement_text = description
+    requirement_label.pack(anchor="w", pady=2)
+    requirement_labels.append(requirement_label)
+
+# Update password strength and requirements while typing.
 password_var.trace_add("write", update_password_strength)
 
 password_entry.focus()
